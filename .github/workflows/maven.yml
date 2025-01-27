@@ -13,7 +13,7 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write  # Permissão necessária para submissão de dependências
+      security-events: write
 
     steps:
     - name: Checkout do código
@@ -32,7 +32,7 @@ jobs:
     - name: Submeter dependências ao Dependency Graph
       uses: advanced-security/maven-dependency-submission-action@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GH_PAT }}
         ignore-maven-wrapper: true
 
 
