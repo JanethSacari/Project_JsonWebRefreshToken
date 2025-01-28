@@ -27,9 +27,3 @@ jobs:
 
     - name: Construir com Maven
       run: mvn -B package --file pom.xml
-
-    - name: Submeter dependências ao Dependency Graph
-      uses: advanced-security/maven-dependency-submission-action@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        ignore-maven-wrapper: true
