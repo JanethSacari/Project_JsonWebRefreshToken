@@ -27,8 +27,3 @@ jobs:
 
     - name: Construir com Maven
       run: mvn -B package --file pom.xml
-
-    - name: Deploy no Railway
-      uses: railwayapp/railway-action@1.2.0
-      with:
-        token: ${{ secrets.RAILWAY_TOKEN }}
