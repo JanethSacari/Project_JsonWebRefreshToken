@@ -27,3 +27,29 @@ jobs:
 
     - name: Construir com Maven
       run: mvn -B package --file pom.xml
+
+    - name: Verificar se a versão foi incrementada corretamente
+      run: |
+        # Obtém a versão atual do pom.xml
+        CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "Versão atual: $CURRENT_VERSION"
+
+        # Obtém a versão anterior do Git
+        PREVIOUS_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "Última versão no Git: $PREVIOUS_VERSION"
+
+        # Extrai os números de versão
+        IFS='.' read -r CURR_MAJOR CURR_MINOR CURR_PATCH <<< "$CURRENT_VERSION"
+        IFS='.' read -r PREV_MAJOR PREV_MINOR PREV_PATCH <<< "$PREVIOUS_VERSION"
+
+        # Verifica se a versão seguiu o SemVer corretamente
+        if [[ $CURR_MAJOR -gt $PREV_MAJOR ]]; then
+          echo "Mudança de versão MAJOR detectada. OK!"
+        elif [[ $CURR_MAJOR -eq $PREV_MAJOR && $CURR_MINOR -gt $PREV_MINOR ]]; then
+          echo "Mudança de versão MINOR detectada. OK!"
+        elif [[ $CURR_MAJOR -eq $PREV_MAJOR && $CURR_MINOR -eq $PREV_MINOR && $CURR_PATCH -gt $PREV_PATCH ]]; then
+          echo "Mudança de versão PATCH detectada. OK!"
+        else
+          echo "Erro: A versão não foi incrementada corretamente conforme SemVer!"
+          exit 1
+        fi
