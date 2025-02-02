@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.repliforce</groupId>
 	<artifactId>RepliforceJsonValidator</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>RepliforceJsonValidator</name>
 	<description>Spring Boot Security Project for Repliforce Intelligence Forces</description>
 	<properties>
