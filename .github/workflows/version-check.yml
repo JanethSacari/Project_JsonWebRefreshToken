@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Version Check
 
 on:
   push:
