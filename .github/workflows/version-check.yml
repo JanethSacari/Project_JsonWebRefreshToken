@@ -17,12 +17,20 @@ jobs:
     steps:
       - name: Verificar se a versão foi incrementada corretamente
         run: |
-          # Obtém a versão correta do pom.xml
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          # Obtém a versão correta do pom.xml e filtra somente a versão
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+')
+
+          # Verifica se a versão foi extraída corretamente
+          if [[ -z "$CURRENT_VERSION" ]]; then
+            echo "Erro: Não foi possível extrair a versão do pom.xml"
+            exit 1
+          fi
+
           echo "Versão atual extraída: $CURRENT_VERSION"
 
           # Obtém a última versão registrada no Git (ou usa "0.0.0" se não houver tags)
           PREVIOUS_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+
           echo "Última versão no Git: $PREVIOUS_VERSION"
 
           # Extrai os números da versão
@@ -37,6 +45,10 @@ jobs:
           PREV_MINOR=${PREV_MINOR:-0}
           PREV_PATCH=${PREV_PATCH:-0}
 
+          # Debug: Mostrar os valores extraídos
+          echo "CURR_MAJOR=$CURR_MAJOR, CURR_MINOR=$CURR_MINOR, CURR_PATCH=$CURR_PATCH"
+          echo "PREV_MAJOR=$PREV_MAJOR, PREV_MINOR=$PREV_MINOR, PREV_PATCH=$PREV_PATCH"
+
           # Verifica se a versão seguiu o SemVer corretamente
           if [[ $CURR_MAJOR -gt $PREV_MAJOR ]]; then
             echo "Mudança de versão MAJOR detectada. OK!"
@@ -48,3 +60,4 @@ jobs:
             echo "Erro: A versão não foi incrementada corretamente conforme SemVer!"
             exit 1
           fi
+      
