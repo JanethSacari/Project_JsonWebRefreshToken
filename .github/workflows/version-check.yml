@@ -17,17 +17,25 @@ jobs:
     steps:
       - name: Verificar se a versão foi incrementada corretamente
         run: |
-          # Obtém a versão atual do pom.xml
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "Versão atual: $CURRENT_VERSION"
+          # Obtém a versão correta do pom.xml
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Versão atual extraída: $CURRENT_VERSION"
 
-          # Obtém a versão anterior do Git
+          # Obtém a última versão registrada no Git (ou usa "0.0.0" se não houver tags)
           PREVIOUS_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
           echo "Última versão no Git: $PREVIOUS_VERSION"
 
-          # Extrai os números de versão
+          # Extrai os números da versão
           IFS='.' read -r CURR_MAJOR CURR_MINOR CURR_PATCH <<< "$CURRENT_VERSION"
           IFS='.' read -r PREV_MAJOR PREV_MINOR PREV_PATCH <<< "$PREVIOUS_VERSION"
+
+          # Converte para números inteiros
+          CURR_MAJOR=${CURR_MAJOR:-0}
+          CURR_MINOR=${CURR_MINOR:-0}
+          CURR_PATCH=${CURR_PATCH:-0}
+          PREV_MAJOR=${PREV_MAJOR:-0}
+          PREV_MINOR=${PREV_MINOR:-0}
+          PREV_PATCH=${PREV_PATCH:-0}
 
           # Verifica se a versão seguiu o SemVer corretamente
           if [[ $CURR_MAJOR -gt $PREV_MAJOR ]]; then
