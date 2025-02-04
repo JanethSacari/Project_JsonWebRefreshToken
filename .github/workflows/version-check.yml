@@ -17,8 +17,14 @@ jobs:
     steps:
       - name: Verificar se a versão foi incrementada corretamente
         run: |
-          # Obtém a versão correta do pom.xml e filtra somente a versão
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+')
+          # Obtém a versão do pom.xml e remove qualquer linha indesejada
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+
+          # Se não conseguir extrair, tenta novamente removendo outras linhas indesejadas
+          if [[ -z "$CURRENT_VERSION" ]]; then
+            echo "Tentando extrair versão de outra forma..."
+            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -n 1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          fi
 
           # Verifica se a versão foi extraída corretamente
           if [[ -z "$CURRENT_VERSION" ]]; then
@@ -60,4 +66,3 @@ jobs:
             echo "Erro: A versão não foi incrementada corretamente conforme SemVer!"
             exit 1
           fi
-      
