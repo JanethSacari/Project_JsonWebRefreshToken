@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Obter versão do pom.xml corretamente
+      - name: Debug versão Maven sem filtragem
         run: |
-          RAW_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "Versão extraída corretamente: '$RAW_VERSION'"
+          echo "=== Testando extração da versão do Maven ==="
+          mvn help:evaluate -Dexpression=project.version -q -DforceStdout || echo "Erro ao executar o Maven!"
