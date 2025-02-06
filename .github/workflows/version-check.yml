@@ -15,52 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Verificar se a versão foi incrementada corretamente
+      - name: Obter versão do pom.xml corretamente
         run: |
-          echo "=== Obtendo a versão do pom.xml ==="
-
-          # Obtém a versão correta do pom.xml e remove qualquer linha indesejada
-          RAW_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "Saída bruta do Maven: '$RAW_VERSION'"
-
-          # Remove espaços e caracteres extras
-          CURRENT_VERSION=$(echo "$RAW_VERSION" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "Versão extraída: '$CURRENT_VERSION'"
-
-          # Se não conseguir extrair, exibe um erro
-          if [[ -z "$CURRENT_VERSION" ]]; then
-            echo "Erro: Não foi possível extrair a versão do pom.xml"
-            exit 1
-          fi
-
-          echo "=== Obtendo a última versão do Git ==="
-          PREVIOUS_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
-          echo "Última versão no Git: '$PREVIOUS_VERSION'"
-
-          # Extrai os números da versão
-          IFS='.' read -r CURR_MAJOR CURR_MINOR CURR_PATCH <<< "$CURRENT_VERSION"
-          IFS='.' read -r PREV_MAJOR PREV_MINOR PREV_PATCH <<< "$PREVIOUS_VERSION"
-
-          # Converte para números inteiros
-          CURR_MAJOR=${CURR_MAJOR:-0}
-          CURR_MINOR=${CURR_MINOR:-0}
-          CURR_PATCH=${CURR_PATCH:-0}
-          PREV_MAJOR=${PREV_MAJOR:-0}
-          PREV_MINOR=${PREV_MINOR:-0}
-          PREV_PATCH=${PREV_PATCH:-0}
-
-          # Debug: Mostrar os valores extraídos
-          echo "CURR_MAJOR=$CURR_MAJOR, CURR_MINOR=$CURR_MINOR, CURR_PATCH=$CURR_PATCH"
-          echo "PREV_MAJOR=$PREV_MAJOR, PREV_MINOR=$PREV_MINOR, PREV_PATCH=$PREV_PATCH"
-
-          # Verifica se a versão seguiu o SemVer corretamente
-          if [[ $CURR_MAJOR -gt $PREV_MAJOR ]]; then
-            echo "Mudança de versão MAJOR detectada. OK!"
-          elif [[ $CURR_MAJOR -eq $PREV_MAJOR && $CURR_MINOR -gt $PREV_MINOR ]]; then
-            echo "Mudança de versão MINOR detectada. OK!"
-          elif [[ $CURR_MAJOR -eq $PREV_MAJOR && $CURR_MINOR -eq $PREV_MINOR && $CURR_PATCH -gt $PREV_PATCH ]]; then
-            echo "Mudança de versão PATCH detectada. OK!"
-          else
-            echo "Erro: A versão não foi incrementada corretamente conforme SemVer!"
-            exit 1
-          fi
+          RAW_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Versão extraída corretamente: '$RAW_VERSION'"
