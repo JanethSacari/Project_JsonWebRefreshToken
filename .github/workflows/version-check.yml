@@ -17,27 +17,25 @@ jobs:
     steps:
       - name: Verificar se a versão foi incrementada corretamente
         run: |
-          # Obtém a versão do pom.xml e remove qualquer linha indesejada
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "=== Obtendo a versão do pom.xml ==="
 
-          # Se não conseguir extrair, tenta novamente removendo outras linhas indesejadas
-          if [[ -z "$CURRENT_VERSION" ]]; then
-            echo "Tentando extrair versão de outra forma..."
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -n 1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-          fi
+          # Obtém a versão correta do pom.xml e remove qualquer linha indesejada
+          RAW_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Saída bruta do Maven: '$RAW_VERSION'"
 
-          # Verifica se a versão foi extraída corretamente
+          # Remove espaços e caracteres extras
+          CURRENT_VERSION=$(echo "$RAW_VERSION" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Versão extraída: '$CURRENT_VERSION'"
+
+          # Se não conseguir extrair, exibe um erro
           if [[ -z "$CURRENT_VERSION" ]]; then
             echo "Erro: Não foi possível extrair a versão do pom.xml"
             exit 1
           fi
 
-          echo "Versão atual extraída: $CURRENT_VERSION"
-
-          # Obtém a última versão registrada no Git (ou usa "0.0.0" se não houver tags)
+          echo "=== Obtendo a última versão do Git ==="
           PREVIOUS_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
-
-          echo "Última versão no Git: $PREVIOUS_VERSION"
+          echo "Última versão no Git: '$PREVIOUS_VERSION'"
 
           # Extrai os números da versão
           IFS='.' read -r CURR_MAJOR CURR_MINOR CURR_PATCH <<< "$CURRENT_VERSION"
