@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug versão Maven sem filtragem
+      - name: Verificar instalação do Maven
         run: |
-          echo "=== Testando extração da versão do Maven ==="
-          mvn help:evaluate -Dexpression=project.version -q -DforceStdout || echo "Erro ao executar o Maven!"
+            echo "=== Versão do Maven ==="
+            mvn -version
