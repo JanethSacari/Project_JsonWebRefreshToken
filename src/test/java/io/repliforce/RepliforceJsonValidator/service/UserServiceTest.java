@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -110,5 +113,37 @@ public class UserServiceTest {
         assertNotNull(foundUsers);
         assertEquals(2, foundUsers.size());
         verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testLoadUserByUsername_UserFound() {
+        User user = new User();
+        user.setUsername("john_doe");
+        user.setPassword("password");
+        Role role = new Role();
+        role.setRolename("ROLE_USER");
+        user.setRoles(List.of(role));
+
+        when(userRepository.findByUsername("john_doe")).thenReturn(user);
+
+        UserDetails userDetails = userService.loadUserByUsername("john_doe");
+
+        assertNotNull(userDetails);
+        assertEquals("john_doe", userDetails.getUsername());
+        assertEquals("password", userDetails.getPassword());
+        assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")));
+        verify(userRepository, times(1)).findByUsername("john_doe");
+    }
+
+    @Test
+    void testLoadUserByUsername_UserNotFound() {
+        when(userRepository.findByUsername("unknown_user")).thenReturn(null);
+
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> {
+            userService.loadUserByUsername("unknown_user");
+        });
+
+        assertEquals("User not found in the database", exception.getMessage());
+        verify(userRepository, times(1)).findByUsername("unknown_user");
     }
 }
