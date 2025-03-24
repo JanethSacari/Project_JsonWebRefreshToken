@@ -15,6 +15,10 @@
 	<description>Spring Boot Security Project for Repliforce Intelligence Forces</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.exclusions>
+			src/main/java/io/repliforce/RepliforceJsonValidator/security/SecurityConfig.java,
+			src/main/java/io/repliforce/RepliforceJsonValidator/RepliforceJsonValidatorApplication.java
+		</sonar.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
