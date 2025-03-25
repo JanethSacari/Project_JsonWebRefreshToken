@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -56,6 +57,23 @@ class CustomAuthenticationFilterTest {
 
         assertNotNull(result);
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+    }
+
+    @Test
+    void testSuccessfulAuthentication() throws IOException, ServletException {
+        User user = new User("user", "password", Collections.emptyList());
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/login"));
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        customAuthenticationFilter.successfulAuthentication(request, response, chain, authentication);
+
+        verify(response, times(1)).setContentType("application/json");
+        verify(response, times(1)).getOutputStream();
+        verify(outputStream, times(1)).write(any(byte[].class), eq(0), anyInt());
     }
 
     @Test
