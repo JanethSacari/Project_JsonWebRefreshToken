@@ -1,5 +1,6 @@
 package io.repliforce.RepliforceJsonValidator;
 
+import io.repliforce.RepliforceJsonValidator.configs.ExcludeFromCoverageGeneratedReport;
 import io.repliforce.RepliforceJsonValidator.domain.Role;
 import io.repliforce.RepliforceJsonValidator.domain.User;
 import io.repliforce.RepliforceJsonValidator.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 
+@ExcludeFromCoverageGeneratedReport
 @SpringBootApplication
 public class RepliforceJsonValidatorApplication {
 

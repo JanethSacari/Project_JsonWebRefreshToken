@@ -1,5 +1,6 @@
 package io.repliforce.RepliforceJsonValidator.security;
 
+import io.repliforce.RepliforceJsonValidator.configs.ExcludeFromCoverageGeneratedReport;
 import io.repliforce.RepliforceJsonValidator.filter.CustomAuthenticationFilter;
 import io.repliforce.RepliforceJsonValidator.filter.CustomAuthorizationFilter;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
+@ExcludeFromCoverageGeneratedReport
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
