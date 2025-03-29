@@ -15,15 +15,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout do código
+    - name: Code checkout
       uses: actions/checkout@v4
 
-    - name: Configurar JDK 11
+    - name: Configure JDK 11
       uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
 
-    - name: Construir com Maven
+    - name: Build with Maven
       run: mvn -B package --file pom.xml
