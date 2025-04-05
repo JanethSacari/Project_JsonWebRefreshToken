@@ -151,4 +151,74 @@ public class UserResourceTest {
         assertEquals(200, response.getStatusCodeValue());
         verify(userService, times(1)).addRoleToUser(form.getUsername(), form.getRolename());
     }
+
+    @Test
+    void getUsersReturnsListOfUsers() {
+        User user1 = new User();
+        user1.setUsername("john_doe");
+        User user2 = new User();
+        user2.setUsername("jane_doe");
+
+        when(userService.getUsers()).thenReturn(Arrays.asList(user1, user2));
+
+        ResponseEntity<List<User>> response = userResource.getUsers();
+
+        assertNotNull(response);
+        assertEquals(2, response.getBody().size());
+        verify(userService, times(1)).getUsers();
+    }
+
+    @Test
+    void saveUserReturnsCreatedUser() {
+        User user = new User();
+        user.setUsername("john_doe");
+
+        when(userService.saveUser(user)).thenReturn(user);
+
+        ResponseEntity<User> response = userResource.saveUser(user);
+
+        assertNotNull(response);
+        assertEquals("john_doe", response.getBody().getUsername());
+        verify(userService, times(1)).saveUser(user);
+    }
+
+    @Test
+    void saveRoleReturnsCreatedRole() {
+        Role role = new Role();
+        role.setRolename("ROLE_USER");
+
+        when(userService.saveRole(role)).thenReturn(role);
+
+        ResponseEntity<Role> response = userResource.saveRole(role);
+
+        assertNotNull(response);
+        assertEquals("ROLE_USER", response.getBody().getRolename());
+        verify(userService, times(1)).saveRole(role);
+    }
+
+    @Test
+    void refreshTokenThrowsExceptionWhenTokenIsMissing() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+
+        assertThrows(RuntimeException.class, () -> {
+            userResource.refreshToken(request, mockResponse);
+        });
+    }
+
+    @Test
+    void addRoleToUserAddsRoleSuccessfully() {
+        RoleToUserForm form = new RoleToUserForm();
+        form.setUsername("john_doe");
+        form.setRolename("ROLE_USER");
+
+        doNothing().when(userService).addRoleToUser(form.getUsername(), form.getRolename());
+
+        ResponseEntity<?> response = userResource.addRoleToUser(form);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        verify(userService, times(1)).addRoleToUser(form.getUsername(), form.getRolename());
+    }
 }
